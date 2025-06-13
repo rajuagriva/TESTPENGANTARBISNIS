@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Interaktif: Pengantar Bisnis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .explanation-enter, .fade-in {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 300ms ease-out, transform 300ms ease-out;
+        }
+        .explanation-enter-active, .fade-in-active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #047857; /* emerald-700 */
+            animation: spin 1s ease infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800">
+
+    <div id="app" class="container mx-auto p-4 md:p-8 min-h-screen flex flex-col items-center">
+        <header class="w-full text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-emerald-800">Kuis Interaktif</h1>
+            <p class="text-stone-500 mt-2 text-lg">Pengantar Konsep Bisnis & Ekonomi</p>
+        </header>
+
+        <main id="main-content" class="w-full flex flex-col items-center">
+            <!-- Konten dinamis akan dimuat di sini -->
+        </main>
+    </div>
+
+    <script>
+        const quizData = {
+            "Dasar Ekonomi": [
+                { question: "Terdapat tiga tujuan utama dari suatu sistem ekonomi. Ketiga tujuan utama itu adalah ....", options: ["growth", "jawaban A, B, dan C benar", "price stability", "high employment rate"], correctAnswer: "jawaban A, B, dan C benar", explanation: "Setiap sistem ekonomi bertujuan mencapai kesejahteraan melalui tiga pilar utama: pertumbuhan ekonomi (growth), stabilitas harga (price stability), dan tingkat penyerapan tenaga kerja yang tinggi (high employment rate). Pilihan ini mencakup ketiganya." },
+                { question: "Pasang surut ekonomi akibat ekspansi dan kontraksi dinamakan siklus bisnis (business cycle). Sebuah siklus dapat dibagi menjadi empat fase umum, yaitu ....", options: ["depression", "jawaban A, B, dan C benar", "prosperity", "recession"], correctAnswer: "jawaban A, B, dan C benar", explanation: "Empat fase umum siklus bisnis adalah kemakmuran (prosperity), resesi (recession), depresi (depression), dan pemulihan (recovery). Pilihan yang diberikan menyebutkan tiga dari empat fase tersebut." },
+                { question: "Selama kemakmuran, ekonomi berkembang, pengangguran rendah, dan pendapatan naik. Ke dalam fase umum apakah ini?", options: ["prosperity", "recovery", "recession", "depression"], correctAnswer: "prosperity", explanation: "Deskripsi soal—ekonomi berkembang, pengangguran rendah, pendapatan naik—secara akurat menggambarkan fase kemakmuran (prosperity), yaitu periode puncak aktivitas ekonomi." },
+                { question: "Sistem ekonomi di mana campur tangan pemerintah dibatasi seminimal mungkin dan diserahkan seluruhnya kepada mekanisme pasar dinamakan sistem ekonomi ....", options: ["campuran", "pasar", "syariah", "komando"], correctAnswer: "pasar", explanation: "Sistem ekonomi pasar (kapitalisme) dicirikan oleh peran pemerintah yang minimal, di mana harga dan alokasi sumber daya ditentukan oleh permintaan dan penawaran." },
+                { question: "Struktur perekonomian berbentuk piramid dengan komisi perencana pusat di puncak yang memberi perintah kepada perusahaan negara di bawahnya. Sistem ini dinamakan sistem ekonomi ....", options: ["syariah", "komando", "pasar", "campuran"], correctAnswer: "komando", explanation: "Sistem ekonomi komando (terpusat) dicirikan oleh kontrol penuh pemerintah atas semua keputusan ekonomi yang dibuat oleh otoritas pusat." },
+                { question: "Ciri-ciri pokok sistem ekonomi komando/sosialis adalah sebagai berikut, kecuali ....", options: ["penggantian mekanisme pasar dengan perencanaan pusat", "pemilikan alat-alat dan sumber produksi oleh negara", "pengambilan putusan produksi, harga, dan distribusi oleh negara", "produksi, distribusi, dan konsumsi ditetapkan melalui perencanaan berjangka"], correctAnswer: "produksi, distribusi, dan konsumsi ditetapkan melalui perencanaan berjangka", explanation: "Meskipun semua pilihan adalah ciri sistem komando, soal ini meminta pengecualian. Dalam beberapa interpretasi, perencanaan berjangka dianggap sebagai metode implementasi, bukan prinsip dasar seperti tiga pilihan lainnya." }
+            ],
+            "Bentuk & Jenis Bisnis": [
+                { question: "Usaha yang aktivitasnya melakukan pembelian sejumlah barang untuk dijual kembali dengan tujuan mencari keuntungan, disebut bisnis ....", options: ["agraris", "manufaktur", "ekstraktif", "perdagangan"], correctAnswer: "perdagangan", explanation: "Kegiatan membeli barang untuk dijual kembali demi mendapatkan laba adalah definisi klasik dari bisnis perdagangan (commerce)." },
+                { question: "Usaha yang kegiatannya meliputi pengolahan bahan mentah menjadi barang setengah jadi atau barang jadi, disebut bisnis ....", options: ["ekstraktif", "agraris", "perdagangan", "manufaktur"], correctAnswer: "manufaktur", explanation: "Proses mengubah bahan mentah menjadi produk jadi melalui proses produksi adalah esensi dari bisnis manufaktur atau industri pengolahan." },
+                { question: "Usaha yang kegiatannya mengelola tanah dan memanfaatkan sumber daya alam untuk memperoleh hasil seperti perkebunan teh atau kopi, disebut bisnis ....", options: ["ekstraktif", "manufaktur", "agraris", "perdagangan"], correctAnswer: "agraris", explanation: "Bisnis agraris berfokus pada pengelolaan lahan dan sumber daya hayati untuk menghasilkan produk pertanian atau perkebunan." },
+                { question: "Produk dibuat dan dipasarkan di negara asal dengan orientasi etnosentris (tanpa memperhatikan pasar global), disebut bisnis ....", options: ["manufaktur", "agraris", "domestic", "ekstraktif"], correctAnswer: "domestic", explanation: "Bisnis yang operasinya terbatas pada negara asal dan produknya dirancang hanya untuk pasar lokal disebut bisnis domestik." },
+                { question: "Organisasi usaha yang menjadi wadah untuk menjalankan kegiatan usaha seperti PD, Firma, CV, dan PT termasuk ke dalam unsur ....", options: ["kegiatan dalam bidang perekonomian", "terus-menerus", "badan usaha", "bersifat tetap"], correctAnswer: "badan usaha", explanation: "PD, Firma, CV, PT, adalah berbagai bentuk yuridis atau wadah untuk menjalankan usaha yang secara kolektif disebut sebagai badan usaha." },
+                { question: "Kegiatan usaha yang tidak berubah dalam waktu singkat, dan jika berganti akan memakan waktu lama, termasuk ke dalam unsur ....", options: ["terang-terangan", "kegiatan dalam bidang perekonomian", "terus-menerus", "bersifat tetap"], correctAnswer: "bersifat tetap", explanation: "Unsur 'bersifat tetap' atau kontinuitas berarti perusahaan didirikan untuk beroperasi dalam jangka panjang dengan jenis kegiatan usaha yang konsisten." },
+                { question: "Unsur perusahaan di mana tujuannya adalah memperoleh kelebihan penerimaan total di atas biaya keseluruhan disebut ....", options: ["terus-menerus", "bersifat tetap", "badan usaha", "keuntungan dan atau laba"], correctAnswer: "keuntungan dan atau laba", explanation: "Definisi ini secara langsung menjelaskan konsep keuntungan atau laba (profit), yang merupakan tujuan utama dari pendirian perusahaan komersial." },
+                { question: "Organisasi yang diciptakan oleh hukum sebagai pembawa hak dan kewajiban, dapat memiliki kekayaan sendiri dan dapat digugat, adalah ....", options: ["perusahaan", "firma", "badan hukum", "badan usaha"], correctAnswer: "badan hukum", explanation: "Badan hukum adalah entitas yang oleh hukum diperlakukan sebagai subjek hukum terpisah dari pemiliknya, memiliki hak dan kewajiban sendiri. Contohnya adalah PT dan Koperasi." },
+                { question: "Berikut ini adalah contoh perusahaan yang umumnya berbadan hukum di Indonesia, kecuali ....", options: ["perusahaan perseroan (persero)", "perseroan terbatas", "perusahaan kapital", "perusahaan jawatan"], correctAnswer: "perusahaan kapital", explanation: "'Perusahaan kapital' adalah istilah umum untuk perusahaan bermodal besar, bukan bentuk badan hukum spesifik menurut hukum Indonesia. PT, Persero, dan Perjan (dulu) adalah bentuk badan hukum yang diakui." },
+                { question: "Badan hukum persekutuan modal, didirikan berdasarkan perjanjian, dan modalnya terbagi dalam saham disebut ....", options: ["perusahaan jawatan", "perseroan terbatas", "perusahaan kapital", "perusahaan perseroan (persero)"], correctAnswer: "perseroan terbatas", explanation: "Definisi ini adalah definisi yuridis dari Perseroan Terbatas (PT), yang ciri utamanya adalah modal terbagi atas saham." },
+                { question: "BUMN yang modalnya dari kekayaan negara, menjadi bagian departemen teknis, dan lebih mengutamakan pelayanan umum disebut ....", options: ["perusahaan jawatan", "perusahaan perseroan (persero)", "yayasan", "perseroan terbatas"], correctAnswer: "perusahaan jawatan", explanation: "Definisi ini secara akurat menggambarkan karakteristik Perusahaan Jawatan (Perjan), bentuk BUMN yang fokusnya adalah pelayanan publik." }
+            ],
+            "Manajemen & Strategi": [
+                { question: "Pandangan manajemen strategis di mana manajer bersifat reaktif dan terus-menerus menyesuaikan rencana dengan perubahan lingkungan disebut mode ....", options: ["Planning mode.", "Jawaban A, B, dan C benar.", "Evolutionary mode.", "Implementation mode."], correctAnswer: "Evolutionary mode.", explanation: "Mode evolusioner (evolutionary) memandang strategi berkembang secara adaptif dan reaktif terhadap lingkungan, berlawanan dengan 'planning mode' yang terstruktur dan formal." },
+                { question: "Arah strategik perusahaan untuk mencapai berbagai hasil di masa mendatang yang menuntun pengerahan sumber daya disebut ....", options: ["tujuan spesifik", "kebijakan", "misi", "visi"], correctAnswer: "visi", explanation: "Visi adalah pernyataan cita-cita atau gambaran masa depan jangka panjang yang ingin dicapai perusahaan, berfungsi sebagai arah strategis." },
+                { question: "Gambaran tentang bisnis apa yang sedang dan akan dijalankan serta tujuan kualitatif yang ingin dicapai perusahaan disebut ....", options: ["tujuan spesifik", "misi", "visi", "kebijakan"], correctAnswer: "misi", explanation: "Misi (mission statement) menjawab pertanyaan fundamental 'Bisnis apa yang kita jalankan?' dan mendefinisikan lingkup serta tujuan kualitatif perusahaan saat ini." },
+                { question: "Hasil akhir yang ingin dicapai perusahaan dalam jangka waktu tertentu dan dinyatakan secara kuantitatif disebut ....", options: ["visi", "misi", "kebijakan", "tujuan spesifik"], correctAnswer: "tujuan spesifik", explanation: "Tujuan spesifik (objectives/goals) adalah target yang terukur, dapat dihitung (kuantitatif), dan memiliki batas waktu untuk mencapai visi dan misi." },
+                { question: "Dokumen tertulis yang menjelaskan rencana perusahaan untuk memanfaatkan peluang usaha yang ada di lingkungan eksternal disebut ....", options: ["business opportunities", "business plan", "competitive advantage", "jawaban A dan B benar"], correctAnswer: "business plan", explanation: "Rencana bisnis (business plan) adalah dokumen formal yang merinci bagaimana sebuah bisnis akan mencapai tujuannya, termasuk strategi, analisis pasar, dan rencana keuangan." },
+                { question: "Kesempatan untuk memperoleh laba dengan memenuhi kebutuhan konsumen yang belum terpenuhi atau dari optimalisasi sumber daya disebut ....", options: ["business plan", "jawaban A dan B benar", "business opportunities", "competitive advantage"], correctAnswer: "business opportunities", explanation: "Definisi ini menjelaskan apa itu peluang usaha (business opportunities), yaitu celah di pasar yang dapat dieksploitasi untuk mendapatkan keuntungan." },
+                { question: "Penjabaran langkah-langkah konkret untuk mengeksploitasi peluang usaha menjadi suatu usaha yang nyata disebut ....", options: ["business plan", "competitive advantage", "operasionalisasi rencana usaha", "business opportunities"], correctAnswer: "operasionalisasi rencana usaha", explanation: "'Operasionalisasi' berarti menerjemahkan rencana yang konseptual (business plan) menjadi langkah-langkah tindakan yang konkret dan dapat dieksekusi." },
+                { question: "Sebuah business plan yang baik sekurang-kurangnya akan mencantumkan elemen-elemen pokok berikut, kecuali ....", options: ["executive summary", "analisis fungsi-fungsi usaha", "jawaban A, B, dan C salah", "general business desciption"], correctAnswer: "jawaban A, B, dan C salah", explanation: "Executive Summary, General Business Description, dan Analisis Fungsi Usaha adalah elemen fundamental dalam business plan. Oleh karena itu, tidak ada yang bisa dikecualikan." },
+                { question: "Pencapaian tujuan perusahaan melalui fungsi perencanaan, pengorganisasian, kepemimpinan, dan pengendalian disebut ....", options: ["bisnis", "administrasi", "manajemen", "organisasi"], correctAnswer: "manajemen", explanation: "Definisi ini merujuk pada empat fungsi inti manajemen (POAC: Planning, Organizing, Actuating, Controlling) untuk mencapai tujuan organisasi." },
+                { question: "Menurut Robert L. Katz, tiga keahlian yang harus dimiliki manajer efektif adalah ....", options: ["conceptual skills", "technical skills", "jawaban A, B, dan C benar", "human skills"], correctAnswer: "jawaban A, B, dan C benar", explanation: "Katz mengidentifikasi tiga keahlian esensial bagi manajer: Keahlian Teknis (technical), Keahlian Manusiawi (human/interpersonal), dan Keahlian Konseptual (conceptual)." },
+                { question: "Kebutuhan seseorang untuk mewujudkan dirinya sendiri sesuai dengan apa yang diinginkan oleh diri sendiri, termasuk ke dalam kebutuhan ....", options: ["akan rasa aman", "fisiologis", "aktualisasi diri", "sosial"], correctAnswer: "aktualisasi diri", explanation: "Ini adalah definisi dari 'aktualisasi diri' (self-actualization) dalam Hierarki Kebutuhan Maslow, yaitu tingkat tertinggi di mana individu mencapai potensi penuhnya." },
+                { question: "Kebutuhan untuk diterima lingkungan, mencintai dan dicintai, serta mengembangkan persahabatan termasuk ke dalam kebutuhan ....", options: ["akan pujian", "akan rasa aman", "fisiologis", "sosial"], correctAnswer: "sosial", explanation: "Kebutuhan ini adalah contoh klasik dari kebutuhan sosial (social needs) atau kebutuhan akan rasa memiliki dan kasih sayang (love and belongingness) dalam teori Maslow." },
+                { question: "Menurut Rakhmat (2004), komunikasi pemimpin dapat dikelompokkan ke dalam tiga kategori berdasarkan dampaknya, kecuali ....", options: ["komunikasi persuasif", "jawaban A, B, dan C salah", "komunikasi rekreatif", "komunikasi informatif"], correctAnswer: "komunikasi rekreatif", explanation: "Dalam konteks kepemimpinan formal, komunikasi informatif dan persuasif adalah kategori utama. Komunikasi rekreatif (untuk hiburan) umumnya bukan tujuan utama." },
+                { question: "Menurut Katz (1974), 3 keahlian yang harus dimiliki oleh sumber daya manusia (manajer) yang baik ialah ....", options: ["technical skills, interpersonal skills and the right man on the right job", "interpersonal skills, track record and the right man on the right job", "technical skills, track record and the right man on the right job", "technical skills, interpersonal skills and conceptual skills"], correctAnswer: "technical skills, interpersonal skills and conceptual skills", explanation: "Teori keahlian Robert Katz menyatakan tiga keahlian fundamental adalah teknis (technical), antar-pribadi (interpersonal/human), dan konseptual (conceptual)." },
+                { question: "Berikut ini adalah tahapan dalam proses pengorganisasian, kecuali ....", options: ["pengisian jabatan", "departementalisasi", "pengembangan SDM", "planning"], correctAnswer: "planning", explanation: "'Planning' (perencanaan) adalah fungsi manajemen yang terpisah dan mendahului fungsi 'Organizing' (pengorganisasian). Departementalisasi dan pengisian jabatan adalah bagian dari proses pengorganisasian." }
+            ],
+            "Pemasaran & Keuangan": [
+                { question: "Menurut Theodore Levitt, konsep pemasaran ialah ....", options: ["pemasaran berfokus kepada kebutuhan si penjual", "pemasaran berfokus untuk memenuhi kebutuhan konsumen melalui penawaran produk", "pemasaran berfokus untuk menjual produknya menjadi uang tunai", "pemasaran dikuasai dengan kebutuhan penjual"], correctAnswer: "pemasaran berfokus untuk memenuhi kebutuhan konsumen melalui penawaran produk", explanation: "Konsep Pemasaran berfokus pada kebutuhan pembeli (menciptakan produk untuk memenuhi kebutuhan), berbeda dengan Konsep Penjualan yang berfokus pada kebutuhan penjual (menjual produk yang ada)." },
+                { question: "Perusahaan melakukan pemilihan pasar melalui serangkaian aktivitas yang dikenal dengan singkatan STP. Singkatan dari STP adalah ....", options: ["segmenting, truth, dan positioning", "segmenting, targeting, dan positioning", "segmenting, targeting, dan people.", "score, targeting, dan positioning."], correctAnswer: "segmenting, targeting, dan positioning", explanation: "STP adalah model strategi pemasaran: Segmenting (membagi pasar), Targeting (memilih segmen), dan Positioning (menciptakan citra unik di benak konsumen)." },
+                { question: "Strategi untuk meningkatkan penjualan produk yang sudah ada di pasar yang sudah ada disebut ....", options: ["Matrix ansoff.", "Market penetration strategy.", "John-wiley.", "Peter doyle."], correctAnswer: "Market penetration strategy.", explanation: "Strategi penetrasi pasar (market penetration) adalah bagian dari Matriks Ansoff yang bertujuan meningkatkan pangsa pasar dengan produk dan pasar yang ada." },
+                { question: "Surat berharga sebagai tanda penyertaan atau pemilikan seseorang atau badan dalam suatu perusahaan. Definisi ini adalah ....", options: ["Tanda bukti utang", "Obligasi", "Saham", "Efek"], correctAnswer: "Saham", explanation: "Saham (stock/share) secara spesifik adalah surat berharga yang menunjukkan bukti kepemilikan modal dalam sebuah perusahaan (perseroan terbatas)." },
+                { question: "Pembagian keuntungan yang diberikan oleh perusahaan penerbit saham yang berasal dari keuntungan perusahaan. Definisi ini adalah ....", options: ["Obligasi", "Saham", "Tanda bukti utang", "Dividen"], correctAnswer: "Dividen", explanation: "Dividen adalah bagian dari laba perusahaan yang dibagikan kepada pemegang saham. Ini adalah imbal hasil atas kepemilikan saham." }
+            ],
+            "Era Digital & Industri": [
+                { question: "Revolusi industri yang memungkinkan pertukaran informasi mudah dan kontrol terintegrasi dari mesin yang bertindak cerdas disebut revolusi industri ....", options: ["4.0", "1.0", "2.0", "3.0"], correctAnswer: "4.0", explanation: "Konsep integrasi sistem siber-fisik, IoT, dan mesin cerdas yang saling terhubung (interoperabilitas) adalah pilar utama dari Revolusi Industri 4.0." },
+                { question: "Periode ketika produksi massa (mass production) dan lini perakitan (assembly line) diperkenalkan sebagai alat utama produksi disebut revolusi industri ....", options: ["1.0", "3.0", "4.0", "2.0"], correctAnswer: "2.0", explanation: "Pengenalan produksi massal dan lini perakitan yang dimungkinkan oleh tenaga listrik adalah ciri khas dari Revolusi Industri 2.0." },
+                { question: "Era di mana industri terganggu akibat munculnya perubahan cara berbisnis yang didorong teknologi digital, seperti kehadiran taksi online, disebut era ...", options: ["konvensional", "disrupsi", "digital", "teknologi"], correctAnswer: "disrupsi", explanation: "Disrupsi (disruption) adalah istilah untuk inovasi yang secara signifikan mengubah atau 'mengganggu' pasar dan model bisnis yang sudah ada." }
+            ]
+        };
+
+        const mainContent = document.getElementById('main-content');
+        
+        let state = {
+            currentCategory: null,
+            currentQuestionIndex: 0,
+            completionStatus: {},
+            userPerformance: [],
+            questionStartTime: 0,
+            activeChart: {
+                categoryScore: null,
+                categoryTime: null,
+                drilldown: null,
+                quadrant: null
+            }
+        };
+
+        function initializeApp() {
+            Object.keys(quizData).forEach(category => {
+                state.completionStatus[category] = false;
+            });
+            renderHome();
+        }
+
+        function renderHome() {
+            mainContent.innerHTML = `
+                <div class="text-center w-full max-w-3xl">
+                    <h2 class="text-2xl font-semibold mb-2">Pilih Kategori</h2>
+                    <p class="text-stone-500 mb-6">Pilih salah satu topik untuk memulai kuis atau lihat hasil akhir jika semua telah selesai.</p>
+                    <div id="category-nav" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                    <div id="analysis-section" class="mt-8"></div>
+                </div>
+            `;
+            const categoryNav = document.getElementById('category-nav');
+            Object.keys(quizData).forEach(category => {
+                const isCompleted = state.completionStatus[category];
+                const categoryButton = document.createElement('button');
+                categoryButton.className = `p-6 bg-white rounded-xl shadow-sm border border-stone-200 hover:border-emerald-500 hover:shadow-lg transition-all text-left flex flex-col justify-between min-h-[130px] ${isCompleted ? 'bg-emerald-50' : ''}`;
+                categoryButton.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-bold text-lg text-emerald-700">${category}</h3>
+                            <p class="text-sm text-stone-500 mt-1">${quizData[category].length} Soal</p>
+                        </div>
+                        ${isCompleted ? '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>' : ''}
+                    </div>
+                    <span class="text-sm font-semibold text-emerald-600 mt-2">${isCompleted ? 'Ulangi Kuis' : 'Mulai Kuis'} →</span>
+                `;
+                categoryButton.onclick = () => startQuiz(category);
+                categoryNav.appendChild(categoryButton);
+            });
+
+            const allCompleted = Object.values(state.completionStatus).every(status => status === true);
+            if (allCompleted) {
+                const analysisButton = document.createElement('button');
+                analysisButton.className = "mt-8 px-8 py-3 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 transition-colors shadow-lg animate-pulse";
+                analysisButton.textContent = "Lihat Dasbor Analisis";
+                analysisButton.onclick = renderAnalysisDashboard;
+                document.getElementById('analysis-section').appendChild(analysisButton);
+            }
+        }
+
+        function startQuiz(category) {
+            state.currentCategory = category;
+            state.currentQuestionIndex = 0;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            state.questionStartTime = Date.now();
+            const questionData = quizData[state.currentCategory][state.currentQuestionIndex];
+            mainContent.innerHTML = `
+                <div class="w-full max-w-2xl">
+                    <div class="text-sm text-stone-500 mb-2">
+                        <span class="font-semibold">${state.currentCategory}</span> &bull; Soal ${state.currentQuestionIndex + 1} dari ${quizData[state.currentCategory].length}
+                    </div>
+                    <div id="quiz-card" class="bg-white p-6 md:p-8 rounded-xl shadow-md border border-stone-200">
+                        <p class="text-lg md:text-xl font-semibold mb-6">${questionData.question}</p>
+                        <div id="options-container" class="space-y-3"></div>
+                        <div id="explanation-container" class="hidden mt-6"></div>
+                        <div id="navigation-container" class="mt-6 text-right"></div>
+                    </div>
+                    <button id="back-to-home" class="mt-6 text-sm text-emerald-600 hover:underline">&larr; Kembali ke Kategori</button>
+                </div>
+            `;
+            const optionsContainer = document.getElementById('options-container');
+            questionData.options.forEach(option => {
+                const optionButton = document.createElement('button');
+                optionButton.className = "block w-full text-left p-4 bg-stone-100/50 border border-stone-200 rounded-lg hover:bg-emerald-50 hover:border-emerald-300 transition-all focus:outline-none focus:ring-2 focus:ring-emerald-400";
+                optionButton.textContent = option;
+                optionButton.onclick = (e) => selectAnswer(e, questionData);
+                optionsContainer.appendChild(optionButton);
+            });
+            document.getElementById('back-to-home').onclick = renderHome;
+        }
+
+        function selectAnswer(event, questionData) {
+            const timeTaken = (Date.now() - state.questionStartTime) / 1000;
+            const selectedButton = event.target;
+            const isCorrect = selectedButton.textContent === questionData.correctAnswer;
+            const existingRecordIndex = state.userPerformance.findIndex(p => p.question === questionData.question);
+            const performanceRecord = {
+                category: state.currentCategory,
+                question: questionData.question,
+                isCorrect: isCorrect,
+                timeTaken: timeTaken,
+                selectedAnswer: selectedButton.textContent
+            };
+            if (existingRecordIndex > -1) {
+                state.userPerformance[existingRecordIndex] = performanceRecord;
+            } else {
+                state.userPerformance.push(performanceRecord);
+            }
+            const allOptions = document.getElementById('options-container').querySelectorAll('button');
+            allOptions.forEach(button => {
+                button.disabled = true;
+                button.classList.remove('hover:bg-emerald-50', 'hover:border-emerald-300');
+                if (button.textContent === questionData.correctAnswer) {
+                    button.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-900', 'font-semibold');
+                }
+            });
+            if (!isCorrect) {
+                selectedButton.classList.add('bg-red-100', 'border-red-500', 'text-red-900');
+            }
+            showExplanation(questionData.explanation);
+            showNavigation();
+        }
+
+        function showExplanation(explanation) {
+            const explanationContainer = document.getElementById('explanation-container');
+            explanationContainer.innerHTML = `<div class="p-4 bg-stone-100 rounded-lg border-l-4 border-emerald-500"><h4 class="font-bold mb-1">Penjelasan</h4><p class="text-stone-600">${explanation}</p></div>`;
+            explanationContainer.classList.remove('hidden');
+            explanationContainer.classList.add('explanation-enter');
+            setTimeout(() => explanationContainer.classList.add('explanation-enter-active'), 10);
+        }
+
+        function showNavigation() {
+            const navigationContainer = document.getElementById('navigation-container');
+            const questionsInCategory = quizData[state.currentCategory];
+            if (state.currentQuestionIndex < questionsInCategory.length - 1) {
+                const nextButton = document.createElement('button');
+                nextButton.className = "px-6 py-2 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition-colors shadow-sm";
+                nextButton.textContent = "Selanjutnya";
+                nextButton.onclick = () => { state.currentQuestionIndex++; renderQuestion(); };
+                navigationContainer.appendChild(nextButton);
+            } else {
+                state.completionStatus[state.currentCategory] = true;
+                const otherCategories = Object.keys(quizData).filter(cat => !state.completionStatus[cat]);
+                navigationContainer.innerHTML = `
+                    <div class="p-4 bg-emerald-100 text-emerald-800 font-semibold rounded-lg text-center">
+                        <p class="font-bold text-lg">Kategori Selesai!</p>
+                        <div class="mt-4 flex flex-col sm:flex-row gap-2 justify-center">
+                            <button onclick="renderHome()" class="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition">Kembali ke Beranda</button>
+                            ${otherCategories.length > 0 ? `<button onclick="startQuiz('${otherCategories[0]}')" class="px-4 py-2 bg-white text-emerald-600 border border-emerald-600 rounded-md hover:bg-emerald-50 transition">Lanjut: ${otherCategories[0]}</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function destroyCharts() {
+            Object.keys(state.activeChart).forEach(key => {
+                if(state.activeChart[key]) {
+                    state.activeChart[key].destroy();
+                    state.activeChart[key] = null;
+                }
+            });
+        }
+        
+        function renderAnalysisDashboard() {
+            destroyCharts();
+            const correctAnswers = state.userPerformance.filter(p => p.isCorrect).length;
+            const incorrectAnswers = state.userPerformance.length - correctAnswers;
+            const percentageCorrect = state.userPerformance.length > 0 ? (correctAnswers / state.userPerformance.length) * 100 : 0;
+            const avgTime = state.userPerformance.length > 0 ? state.userPerformance.reduce((acc, p) => acc + p.timeTaken, 0) / state.userPerformance.length : 0;
+
+            mainContent.innerHTML = `
+                <div class="w-full max-w-6xl bg-white p-6 md:p-8 rounded-xl shadow-lg border border-stone-200">
+                    <h2 class="text-2xl md:text-3xl font-bold text-center text-emerald-800 mb-2">Dasbor Analisis Performa</h2>
+                    <p class="text-center text-stone-500 mb-8">Lihat rincian pengerjaan kuis Anda secara visual.</p>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 text-center">
+                        <div class="p-4 bg-stone-100 rounded-lg"><p class="text-sm text-stone-500">Skor Akhir</p><p class="text-2xl font-bold">${percentageCorrect.toFixed(1)}%</p></div>
+                        <div class="p-4 bg-emerald-100 rounded-lg"><p class="text-sm text-emerald-600">Jawaban Benar</p><p class="text-2xl font-bold text-emerald-800">${correctAnswers}</p></div>
+                        <div class="p-4 bg-red-100 rounded-lg"><p class="text-sm text-red-600">Jawaban Salah</p><p class="text-2xl font-bold text-red-800">${incorrectAnswers}</p></div>
+                        <div class="p-4 bg-stone-100 rounded-lg"><p class="text-sm text-stone-500">Waktu Rata-rata</p><p class="text-2xl font-bold">${avgTime.toFixed(1)}s</p></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                        <div class="p-4 rounded-lg border"><h3 class="font-semibold mb-2 text-center">Matriks Kecepatan vs Akurasi</h3><canvas id="quadrantChart"></canvas></div>
+                        <div class="p-4 rounded-lg border"><h3 class="font-semibold mb-2 text-center">Waktu Rata-Rata per Kategori</h3><canvas id="timeByCategoryChart"></canvas></div>
+                    </div>
+
+                    <div id="drilldown-container" class="hidden p-4 rounded-lg border mb-8">
+                        <h3 id="drilldown-title" class="font-semibold mb-2 text-center"></h3>
+                        <canvas id="drilldownChart"></canvas>
+                    </div>
+
+                     <div id="focus-area-container" class="p-4 rounded-lg border bg-amber-50 border-amber-200 mb-8">
+                        <h3 class="font-semibold mb-4 text-center text-amber-800">Area Fokus Perbaikan Anda</h3>
+                         <div id="focus-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button onclick="renderGeminiDetailPage()" class="px-6 py-3 bg-emerald-700 text-white font-bold rounded-lg hover:bg-emerald-800 transition shadow-lg">Dapatkan Umpan Balik Mendalam dari AI Mentor</button>
+                        <button onclick="renderHome()" class="mt-4 sm:mt-0 sm:ml-4 text-sm text-emerald-600 hover:underline">Kembali ke Beranda</button>
+                    </div>
+                </div>
+            `;
+            
+            renderAdvancedAnalytics();
+        }
+
+        function calculateStdDev(arr) {
+            const n = arr.length;
+            if (n === 0) return 0;
+            const mean = arr.reduce((a, b) => a + b) / n;
+            const variance = arr.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n;
+            return Math.sqrt(variance);
+        }
+
+        function renderAdvancedAnalytics() {
+            const categories = Object.keys(quizData);
+            const perfData = categories.map(cat => {
+                const catPerf = state.userPerformance.filter(p => p.category === cat);
+                const correct = catPerf.filter(p => p.isCorrect).length;
+                const totalTime = catPerf.reduce((acc, p) => acc + p.timeTaken, 0);
+                const timeArr = catPerf.map(p => p.timeTaken);
+
+                return {
+                    category: cat,
+                    accuracy: catPerf.length > 0 ? (correct / catPerf.length) * 100 : 0,
+                    avgTime: catPerf.length > 0 ? totalTime / catPerf.length : 0,
+                    timeStdDev: calculateStdDev(timeArr)
+                };
+            });
+
+            // Quadrant Chart
+            const quadrantData = {
+                datasets: perfData.map(d => ({
+                    label: d.category,
+                    data: [{ x: d.accuracy, y: d.avgTime }],
+                    backgroundColor: `hsla(${120 + d.category.length * 20}, 60%, 60%, 0.7)`
+                }))
+            };
+            const quadrantCtx = document.getElementById('quadrantChart').getContext('2d');
+            state.activeChart.quadrant = new Chart(quadrantCtx, {
+                type: 'scatter',
+                data: quadrantData,
+                options: {
+                    scales: {
+                        x: { title: { display: true, text: 'Akurasi (%)' }, min: 0, max: 100 },
+                        y: { title: { display: true, text: 'Kecepatan (detik, lebih rendah lebih baik)' }, beginAtZero: true }
+                    },
+                    plugins: {
+                        tooltip: { callbacks: { label: (context) => context.dataset.label } },
+                        legend: { display: false },
+                         annotation: {
+                            annotations: {
+                                line1: { type: 'line', xMin: 50, xMax: 50, borderColor: 'rgba(0,0,0,0.1)', borderWidth: 1 },
+                                line2: { type: 'line', yMin: 10, yMax: 10, borderColor: 'rgba(0,0,0,0.1)', borderWidth: 1 } // Adjust yMin/yMax based on avg times
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Time Chart (interaktif)
+            const timeChartCtx = document.getElementById('timeByCategoryChart').getContext('2d');
+            const timeChart = new Chart(timeChartCtx, {
+                type: 'bar',
+                data: { labels: categories, datasets: [{ label: 'Waktu Rata-rata (detik)', data: perfData.map(d => d.avgTime), backgroundColor: '#60A5FA' }] },
+                options: { 
+                    indexAxis: 'y', responsive: true, plugins: { legend: { display: false } },
+                    onClick: (evt) => {
+                        const points = timeChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+                        if (points.length) renderDrillDownChart(timeChart.data.labels[points[0].index]);
+                    }
+                }
+            });
+            state.activeChart.categoryTime = timeChart;
+
+            // Focus Area
+            const focusQuestions = state.userPerformance
+                .filter(p => !p.isCorrect || p.timeTaken > (state.userPerformance.reduce((a, b) => a + b.timeTaken, 0) / state.userPerformance.length) * 1.5)
+                .sort((a, b) => a.timeTaken - b.timeTaken)
+                .slice(0, 3);
+            
+            const focusContainer = document.getElementById('focus-cards');
+            if(focusQuestions.length > 0) {
+                 focusQuestions.forEach(q => {
+                    const card = document.createElement('div');
+                    card.className = "p-4 bg-white rounded-lg border border-amber-300 shadow-sm";
+                    card.innerHTML = `
+                        <p class="text-sm font-semibold text-stone-700 truncate">${q.question}</p>
+                        <p class="text-xs text-stone-500 mt-1">Kategori: ${q.category}</p>
+                        <div class="text-xs mt-2">
+                           ${!q.isCorrect ? `<span class="font-bold text-red-600">Salah Dijawab</span>` : `<span class="font-bold text-blue-600">Waktu Lama</span> (${q.timeTaken.toFixed(1)}s)`}
+                        </div>
+                    `;
+                    focusContainer.appendChild(card);
+                });
+            } else {
+                focusContainer.innerHTML = `<p class="text-center text-stone-600 col-span-full">Kerja bagus! Tidak ada soal yang butuh perhatian khusus saat ini.</p>`;
+            }
+        }
+        
+        function renderDrillDownChart(category) {
+            const container = document.getElementById('drilldown-container');
+            container.classList.remove('hidden');
+            document.getElementById('drilldown-title').textContent = `Rincian Waktu per Soal: ${category}`;
+
+            if (state.activeChart.drilldown) state.activeChart.drilldown.destroy();
+
+            const catPerf = state.userPerformance.filter(p => p.category === category);
+            const chartData = {
+                labels: catPerf.map((_, i) => `Soal ${i + 1}`),
+                datasets: [{
+                    label: 'Waktu Pengerjaan (detik)',
+                    data: catPerf.map(p => p.timeTaken),
+                    backgroundColor: catPerf.map(p => p.isCorrect ? '#34D399' : '#F87171')
+                }]
+            };
+
+            const ctx = document.getElementById('drilldownChart').getContext('2d');
+            state.activeChart.drilldown = new Chart(ctx, {
+                type: 'bar',
+                data: chartData,
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
+            container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function renderGeminiDetailPage() {
+             mainContent.innerHTML = `
+                <div class="w-full max-w-4xl bg-white p-6 md:p-8 rounded-xl shadow-lg border border-stone-200">
+                    <div id="gemini-analysis-container">
+                        <div id="gemini-loading" class="flex flex-col items-center justify-center h-full">
+                            <div class="spinner"></div>
+                            <p class="mt-4 text-stone-500">Meminta analisis mendalam dari AI Mentor...</p>
+                        </div>
+                        <div id="gemini-content" class="hidden"></div>
+                    </div>
+                    <div class="mt-8 text-center">
+                        <button onclick="renderAnalysisDashboard()" class="text-sm text-emerald-600 hover:underline">&larr; Kembali ke Dasbor Analisis</button>
+                    </div>
+                </div>
+            `;
+            generateDetailedGeminiFeedback();
+        }
+        
+        async function generateDetailedGeminiFeedback() {
+            const { userPerformance } = state;
+            const correctAnswers = userPerformance.filter(p => p.isCorrect).length;
+            const percentageCorrect = userPerformance.length > 0 ? (correctAnswers / userPerformance.length) * 100 : 0;
+            const avgTime = userPerformance.length > 0 ? userPerformance.reduce((acc, p) => acc + p.timeTaken, 0) / userPerformance.length : 0;
+            let performanceByCategory = {};
+            Object.keys(quizData).forEach(cat => {
+                const catQuestions = userPerformance.filter(p => p.category === cat);
+                if (catQuestions.length > 0) {
+                    const correct = catQuestions.filter(q => q.isCorrect).length;
+                    performanceByCategory[cat] = {
+                        score: ((correct / catQuestions.length) * 100).toFixed(0) + '%',
+                        avgTime: (catQuestions.reduce((acc, p) => acc + p.timeTaken, 0) / catQuestions.length).toFixed(1) + 's'
+                    };
+                }
+            });
+
+            const prompt = `
+                Anda adalah seorang mentor ahli strategi belajar dan analis performa. Seorang pengguna telah menyelesaikan kuis Pengantar Bisnis dan meminta analisis teknis mendalam.
+                Data performa:
+                - Skor Keseluruhan: ${percentageCorrect.toFixed(1)}% benar.
+                - Rata-rata waktu menjawab: ${avgTime.toFixed(1)} detik per soal.
+                - Performa per kategori (skor, waktu rata-rata): ${JSON.stringify(performanceByCategory)}
+                - Contoh jawaban salah: ${JSON.stringify(userPerformance.filter(p => !p.isCorrect).slice(0, 2).map(p => ({soal: p.question, jawabanUser: p.selectedAnswer})))}
+
+                Tugas Anda adalah membuat halaman analisis dengan format berikut:
+
+                ### Judul: Analisis & Strategi Belajar
+                
+                #### 1. Ringkasan Performa (Brief & Motivating)
+                Berikan sapaan positif dan ringkasan singkat hasil kerja pengguna. Puji usaha mereka.
+
+                #### 2. Analisis Pola Pengerjaan (Technical & Insightful)
+                Analisis hubungan antara kecepatan dan akurasi.
+                - Jika pengguna cepat dan akurat: Puji efisiensinya.
+                - Jika pengguna cepat tapi tidak akurat: Sarankan untuk sedikit lebih berhati-hati dan membaca semua pilihan, bahkan jika sudah merasa tahu jawabannya.
+                - Jika pengguna lambat tapi akurat: Puji ketelitiannya, tapi sarankan mungkin ada ruang untuk meningkatkan kepercayaan diri pada topik yang sudah dikuasai.
+                - Jika pengguna lambat dan tidak akurat: Sarankan untuk fokus pada penguatan konsep dasar terlebih dahulu sebelum mengejar kecepatan.
+
+                #### 3. Rekomendasi Area Fokus (Actionable)
+                Berdasarkan data performa kategori:
+                - **Area Kekuatan:** Sebutkan 1-2 kategori dengan skor tertinggi. Jelaskan bahwa ini adalah fondasi yang baik.
+                - **Area Peningkatan:** Sebutkan 1-2 kategori dengan skor terendah. Berikan masukan yang sangat spesifik dan membangun. Jika ada data jawaban salah, gunakan itu untuk memberi contoh miskonsepsi. Contoh: "Di kategori 'Dasar Ekonomi', tampaknya konsep 'Siklus Bisnis' perlu diperkuat. Saya melihat Anda menjawab 'recovery' pada soal tentang kemakmuran, ini menunjukkan mungkin ada sedikit kebingungan antara fase 'bangkit' dan fase 'puncak'."
+                
+                #### 4. Strategi Pengerjaan Soal Berikutnya (General Tips)
+                Berikan 2-3 tips umum untuk mengerjakan kuis dengan lebih efektif di masa depan. Contoh:
+                - **Teknik Eliminasi:** Jika ragu, coba eliminasi pilihan jawaban yang paling tidak mungkin terlebih dahulu.
+                - **Baca Pertanyaan dengan Seksama:** Pastikan Anda memahami apa yang ditanyakan, terutama pada soal dengan kata "kecuali".
+                - **Hubungkan Konsep:** Cobalah untuk tidak menghafal definisi, tetapi pahami bagaimana satu konsep berhubungan dengan yang lain.
+
+                Gunakan format Markdown yang jelas dengan heading (### dan ####), bullet points, dan bold. Buat agar hasilnya terstruktur, mudah dibaca, dan sangat bermanfaat.
+            `;
+            
+            const loadingEl = document.getElementById('gemini-loading');
+            const contentEl = document.getElementById('gemini-content');
+            
+            try {
+                const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+                const apiKey = ""; 
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0) {
+                    let text = result.candidates[0].content.parts[0].text;
+                    let formattedText = text
+                        .replace(/### (.*?)\n/g, '<h3 class="text-2xl font-bold text-emerald-800 mt-6 mb-3">$1</h3>')
+                        .replace(/#### (.*?)\n/g, '<h4 class="text-xl font-semibold text-emerald-700 mt-4 mb-2">$1</h4>')
+                        .replace(/\* (.*?)(?=\n\*|\n\n|$)/g, '<li class="ml-5 mb-2 list-disc">$1</li>');
+                     formattedText = formattedText.replace(/<\/li>\n/g, '</li>');
+
+                    contentEl.innerHTML = `<div class="prose prose-lg max-w-none text-stone-700">${formattedText}</div>`;
+                } else {
+                   throw new Error("Respon dari AI tidak valid.");
+                }
+
+            } catch (error) {
+                console.error("Error fetching Gemini analysis:", error);
+                contentEl.innerHTML = `<h3 class="text-xl font-bold text-red-800 mb-3">Oops! Terjadi Kesalahan</h3><p class="text-stone-600">Tidak dapat memuat analisis dari AI saat ini. Silakan coba lagi nanti.</p>`;
+            } finally {
+                loadingEl.classList.add('hidden');
+                contentEl.classList.remove('hidden');
+                contentEl.classList.add('fade-in');
+                setTimeout(() => contentEl.classList.add('fade-in-active'), 10);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>
